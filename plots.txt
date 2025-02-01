@@ -1,0 +1,31 @@
+pairs(data1[1:12], main = "Scatterplot Matrix")  # Reduce margins
+
+
+# Load necessary libraries
+library(ggplot2)   # For plotting
+library(reshape2)  # For reshaping data (melt function)
+library(scales)    # For color scaling
+library(dplyr)     # For data manipulation
+
+# Convert categorical variables to numeric
+data1_numeric <- data1 %>%
+    mutate(across(c(Transmission, Owner, FuelType, Brand.model), as.numeric))
+
+# Select only specific columns
+selected_data <- data1_numeric %>% select(Age, kmDriven, Transmission, Owner, FuelType, isLuxury, kmPerYear, Brand.model)
+
+# Compute correlation matrix
+cor_matrix <- cor(selected_data, use = "complete.obs")
+
+# Convert correlation matrix to long format for ggplot2
+cor_data <- melt(cor_matrix)
+
+# Plot correlation matrix using ggplot2
+ggplot(cor_data, aes(x = Var1, y = Var2, size = abs(value), fill = value)) +
+    geom_point(shape = 21, color = "black") +  # Circles with black border
+    scale_size(range = c(1, 10)) +  # Adjust circle size
+    scale_fill_gradient2(low = "blue", mid = "white", high = "red", midpoint = 0) +
+    labs(title = "Correlation Matrix (Selected Columns)", x = "", y = "") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, color = "red", size = 12, face = "bold"),  
+          axis.text.y = element_text(color = "red", size = 12, face = "bold"))
